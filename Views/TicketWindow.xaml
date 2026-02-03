@@ -1,0 +1,59 @@
+﻿<Window x:Class="PicaPolloRey.POS.Views.TicketWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ticket (Simulación)"
+        Height="520" Width="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Background="#FF111827" CornerRadius="10" Padding="12" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="PICA POLLO REY" Foreground="White" FontSize="18" FontWeight="Bold"/>
+                <TextBlock Text="{Binding HeaderInfo}" Foreground="#FFE5E7EB" Margin="0,4,0,0"/>
+                <TextBlock Text="{Binding PaymentInfo}" Foreground="#FFE5E7EB"/>
+            </StackPanel>
+        </Border>
+
+        <GroupBox Grid.Row="1" Header="Detalle">
+            <DataGrid ItemsSource="{Binding Items}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Producto" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Cant." Binding="{Binding Qty}" Width="70"/>
+                    <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat=C}" Width="110"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <Border Grid.Row="2" BorderBrush="#FFE5E7EB" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,12,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="{Binding SubtotalText}" />
+                    <TextBlock Text="{Binding ItbisText}" />
+                    <TextBlock Text="{Binding TotalText}" FontWeight="Bold" FontSize="16" Margin="0,6,0,0"/>
+                    <TextBlock Text="(Simulación: aquí se imprimiría el ticket)" Foreground="Gray" Margin="0,6,0,0"/>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="OK"
+                        Width="90" Height="34"
+                        VerticalAlignment="Bottom"
+                        Margin="12,0,0,0"
+                        Click="BtnOk_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
