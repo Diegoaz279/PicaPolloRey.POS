@@ -9,6 +9,7 @@ namespace PicaPolloRey.POS.Models
 
         public Product Product { get; set; } = new Product();
 
+
         public int Quantity
         {
             get => _quantity;
