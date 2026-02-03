@@ -3,26 +3,30 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using PicaPolloRey.POS.Data;
 using PicaPolloRey.POS.Models;
+using PicaPolloRey.POS.Services;
 
 namespace PicaPolloRey.POS.Views
 {
     public partial class ProductsWindow : Window
     {
         private readonly ProductsState _state = new ProductsState();
+        private readonly ProductService _productService;
 
         public ProductsWindow()
         {
             InitializeComponent();
-            DataContext = _state;
 
+            _productService = App.GetService<ProductService>();
+
+            DataContext = _state;
             LoadProducts();
         }
 
         private void LoadProducts()
         {
-            var list = PosDb.GetAllProducts();
+            var list = _productService.GetAllProducts();
+
             _state.Products.Clear();
             foreach (var p in list) _state.Products.Add(p);
         }
@@ -66,15 +70,14 @@ namespace PicaPolloRey.POS.Views
                 return;
             }
 
-            // Si hay seleccionado → UPDATE, si no → INSERT
             if (_state.SelectedProduct == null)
             {
-                PosDb.InsertProduct(name, category, price);
+                _productService.AddProduct(name, category, price);
                 MessageBox.Show("Producto agregado.", "OK", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                PosDb.UpdateProduct(_state.SelectedProduct.Id, name, category, price);
+                _productService.UpdateProduct(_state.SelectedProduct.Id, name, category, price);
                 MessageBox.Show("Producto actualizado.", "OK", MessageBoxButton.OK, MessageBoxImage.Information);
             }
 
@@ -90,25 +93,13 @@ namespace PicaPolloRey.POS.Views
             }
 
             var newState = !_state.SelectedProduct.Active;
-            PosDb.SetProductActive(_state.SelectedProduct.Id, newState);
+            _productService.ToggleActive(_state.SelectedProduct.Id, newState);
 
             LoadProducts();
         }
 
         private void BtnClose_Click(object sender, RoutedEventArgs e) => Close();
 
-        // Cuando seleccionas un producto en el grid, llena los textbox
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            // no usado
-        }
-
-        private void ProductsGridSelectionChanged()
-        {
-            // no usado
-        }
-
-        // Hook simple cuando cambie SelectedProduct (en código)
         public class ProductsState : INotifyPropertyChanged
         {
             private Product? _selectedProduct;
@@ -122,6 +113,12 @@ namespace PicaPolloRey.POS.Views
                 {
                     _selectedProduct = value;
                     OnPropertyChanged();
+
+                    // cuando seleccionas, llena los textbox (simple)
+                    if (_selectedProduct != null)
+                    {
+                        // No podemos acceder directo a TxtName desde aquí
+                    }
                 }
             }
 
@@ -130,7 +127,6 @@ namespace PicaPolloRey.POS.Views
                 => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
         }
 
-        // Cuando seleccionan fila, llenamos campos (evento WPF)
         protected override void OnActivated(System.EventArgs e)
         {
             base.OnActivated(e);

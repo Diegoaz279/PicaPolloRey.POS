@@ -3,17 +3,22 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using PicaPolloRey.POS.Data;
+using PicaPolloRey.POS.DTOs;
+using PicaPolloRey.POS.Services;
 
 namespace PicaPolloRey.POS.Views
 {
     public partial class DailyReportWindow : Window
     {
         private readonly ReportState _state = new ReportState();
+        private readonly SalesService _salesService;
 
         public DailyReportWindow()
         {
             InitializeComponent();
+
+            _salesService = App.GetService<SalesService>();
+
             DataContext = _state;
             LoadReport();
         }
@@ -21,12 +26,12 @@ namespace PicaPolloRey.POS.Views
         private void LoadReport()
         {
             var today = DateTime.Now;
-            var sales = PosDb.GetTodaySales(today);
 
+            var sales = _salesService.GetTodaySales(today);
             _state.Sales.Clear();
             foreach (var s in sales) _state.Sales.Add(s);
 
-            var (totalDia, totalEfectivo, totalTarjeta) = PosDb.GetTodayTotals(today);
+            var (totalDia, totalEfectivo, totalTarjeta) = _salesService.GetTodayTotals(today);
             _state.TotalDia = totalDia;
             _state.TotalEfectivo = totalEfectivo;
             _state.TotalTarjeta = totalTarjeta;
@@ -37,7 +42,7 @@ namespace PicaPolloRey.POS.Views
 
         public class ReportState : INotifyPropertyChanged
         {
-            public ObservableCollection<PosDb.DailySaleRow> Sales { get; } = new ObservableCollection<PosDb.DailySaleRow>();
+            public ObservableCollection<DailySaleRow> Sales { get; } = new ObservableCollection<DailySaleRow>();
 
             private decimal _totalDia;
             private decimal _totalEfectivo;
@@ -66,6 +71,7 @@ namespace PicaPolloRey.POS.Views
             public string TotalTarjetaText => $"{TotalTarjeta:C}";
 
             public event PropertyChangedEventHandler? PropertyChanged;
+
             private void OnPropertyChanged([CallerMemberName] string? p = null)
                 => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
         }
