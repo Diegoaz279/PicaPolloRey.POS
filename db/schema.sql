@@ -31,14 +31,32 @@ CREATE TABLE IF NOT EXISTS VentaDetalle (
 -- SEED (solo si no hay productos)
 INSERT INTO Producto (Nombre, Categoria, Precio, Activo)
 SELECT 'Combo Pollo 2 piezas', 'Combos', 250, 1
-WHERE NOT EXISTS (SELECT 1 FROM Producto);
+WHERE (SELECT COUNT(*) FROM Producto) = 0;
 
-INSERT INTO Producto (Nombre, Categoria, Precio, Activo) VALUES
-('Combo Pollo 3 piezas', 'Combos', 320, 1),
-('Pollo 1 pieza', 'Pollo', 120, 1),
-('Pollo 2 piezas', 'Pollo', 220, 1),
-('Papas Fritas', 'Acompañantes', 90, 1),
-('Tostones', 'Acompañantes', 90, 1),
-('Refresco', 'Bebidas', 70, 1),
-('Agua', 'Bebidas', 40, 1)
-;
+INSERT INTO Producto (Nombre, Categoria, Precio, Activo)
+SELECT 'Combo Pollo 3 piezas', 'Combos', 320, 1
+WHERE (SELECT COUNT(*) FROM Producto) = 0;
+
+INSERT INTO Producto (Nombre, Categoria, Precio, Activo)
+SELECT 'Pollo 1 pieza', 'Pollo', 120, 1
+WHERE (SELECT COUNT(*) FROM Producto) = 0;
+
+INSERT INTO Producto (Nombre, Categoria, Precio, Activo)
+SELECT 'Pollo 2 piezas', 'Pollo', 220, 1
+WHERE (SELECT COUNT(*) FROM Producto) = 0;
+
+INSERT INTO Producto (Nombre, Categoria, Precio, Activo)
+SELECT 'Papas Fritas', 'Acompañantes', 90, 1
+WHERE (SELECT COUNT(*) FROM Producto) = 0;
+
+INSERT INTO Producto (Nombre, Categoria, Precio, Activo)
+SELECT 'Tostones', 'Acompañantes', 90, 1
+WHERE (SELECT COUNT(*) FROM Producto) = 0;
+
+INSERT INTO Producto (Nombre, Categoria, Precio, Activo)
+SELECT 'Refresco', 'Bebidas', 70, 1
+WHERE (SELECT COUNT(*) FROM Producto) = 0;
+
+INSERT INTO Producto (Nombre, Categoria, Precio, Activo)
+SELECT 'Agua', 'Bebidas', 40, 1
+WHERE (SELECT COUNT(*) FROM Producto) = 0;

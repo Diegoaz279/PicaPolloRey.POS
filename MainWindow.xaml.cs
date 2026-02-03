@@ -9,6 +9,7 @@ using PicaPolloRey.POS.Models;
 using PicaPolloRey.POS.Views;
 using PicaPolloRey.POS.Data;
 
+
 namespace PicaPolloRey.POS
 {
     public partial class MainWindow : Window
@@ -130,6 +131,24 @@ namespace PicaPolloRey.POS
             _state.SelectedCartItem = null;
             _state.RecalculateTotals(ITBIS_RATE);
         }
+        private void BtnOpenProducts_Click(object sender, RoutedEventArgs e)
+        {
+            var w = new ProductsWindow();
+            w.Owner = this;
+            w.ShowDialog();
+
+            // Al cerrar productos, recarga catálogo (por si agregaron/editaron)
+            _state.LoadProductsFromDb();
+            _state.RefreshFilteredProducts();
+        }
+
+        private void BtnOpenReport_Click(object sender, RoutedEventArgs e)
+        {
+            var w = new DailyReportWindow();
+            w.Owner = this;
+            w.ShowDialog();
+        }
+
     }
     // Estado monolítico (Commit 1): todo en la ventana
     public class MainState : INotifyPropertyChanged

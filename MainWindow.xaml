@@ -19,14 +19,19 @@
             <DockPanel>
                 <StackPanel>
                     <TextBlock Text="Pica Pollo Rey" Foreground="White" FontSize="22" FontWeight="Bold"/>
-                    <TextBlock Text="POS - Commit 1 (Monolítico, Sin SQLite)" Foreground="#FFE5E7EB" FontSize="12"/>
+                    <TextBlock Text="POS - Commit 3 (Productos + Reporte Día)" Foreground="#FFE5E7EB" FontSize="12"/>
                 </StackPanel>
-                <TextBlock DockPanel.Dock="Right"
-                           Text="{Binding TodayText}"
-                           Foreground="#FFE5E7EB"
-                           FontSize="12"
-                           VerticalAlignment="Center"/>
+
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Productos" Width="110" Height="32" Margin="0,0,10,0" Click="BtnOpenProducts_Click"/>
+                    <Button Content="Reporte Día" Width="110" Height="32" Margin="0,0,10,0" Click="BtnOpenReport_Click"/>
+                    <TextBlock Text="{Binding TodayText}"
+                   Foreground="#FFE5E7EB"
+                   FontSize="12"
+                   VerticalAlignment="Center"/>
+                </StackPanel>
             </DockPanel>
+
         </Border>
 
         <!-- Left: Product List -->
