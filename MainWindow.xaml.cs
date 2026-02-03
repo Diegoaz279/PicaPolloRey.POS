@@ -7,6 +7,7 @@ using System.Windows;
 using PicaPolloRey.POS.Helpers;
 using PicaPolloRey.POS.Models;
 using PicaPolloRey.POS.Views;
+using PicaPolloRey.POS.Data;
 
 namespace PicaPolloRey.POS
 {
@@ -22,7 +23,8 @@ namespace PicaPolloRey.POS
             InitializeComponent();
 
             _state.TodayText = DateTime.Now.ToString("dddd, dd MMM yyyy - HH:mm");
-            _state.LoadDefaultProducts();
+            PosDb.Initialize(); // crea BD + tablas + seed
+            _state.LoadProductsFromDb();
             _state.RefreshFilteredProducts();
             _state.RecalculateTotals(ITBIS_RATE);
 
@@ -88,21 +90,27 @@ namespace PicaPolloRey.POS
                 return;
             }
 
-            // Validar cantidades
             foreach (var item in _state.Cart)
             {
                 if (item.Quantity < 1)
-                {
                     item.Quantity = 1;
-                }
             }
 
             _state.RecalculateTotals(ITBIS_RATE);
 
-            // "Simular" número de ticket
-            var ticketNumber = $"T-{DateTime.Now:yyyyMMddHHmmss}";
-
             var paymentMethod = _state.IsCash ? "EFECTIVO" : "TARJETA";
+
+            // Guardar en BD
+            long ventaId = PosDb.InsertSale(
+                DateTime.Now,
+                paymentMethod,
+                _state.Subtotal,
+                _state.Itbis,
+                _state.Total,
+                _state.Cart.ToList()
+            );
+
+            var ticketNumber = $"V-{ventaId}";
 
             var ticket = new TicketWindow(
                 ticketNumber,
@@ -118,13 +126,11 @@ namespace PicaPolloRey.POS
             ticket.Owner = this;
             ticket.ShowDialog();
 
-            // Luego de "imprimir", limpiamos carrito
             _state.Cart.Clear();
             _state.SelectedCartItem = null;
             _state.RecalculateTotals(ITBIS_RATE);
         }
     }
-
     // Estado monolítico (Commit 1): todo en la ventana
     public class MainState : INotifyPropertyChanged
     {
@@ -222,19 +228,13 @@ namespace PicaPolloRey.POS
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public void LoadDefaultProducts()
+        public void LoadProductsFromDb()
         {
             Products.Clear();
 
-            // Catálogo básico (Commit 1)
-            Products.Add(new Product { Id = 1, Name = "Combo Pollo 2 piezas", Category = "Combos", Price = 250m });
-            Products.Add(new Product { Id = 2, Name = "Combo Pollo 3 piezas", Category = "Combos", Price = 320m });
-            Products.Add(new Product { Id = 3, Name = "Pollo 1 pieza", Category = "Pollo", Price = 120m });
-            Products.Add(new Product { Id = 4, Name = "Pollo 2 piezas", Category = "Pollo", Price = 220m });
-            Products.Add(new Product { Id = 5, Name = "Papas Fritas", Category = "Acompañantes", Price = 90m });
-            Products.Add(new Product { Id = 6, Name = "Tostones", Category = "Acompañantes", Price = 90m });
-            Products.Add(new Product { Id = 7, Name = "Refresco", Category = "Bebidas", Price = 70m });
-            Products.Add(new Product { Id = 8, Name = "Agua", Category = "Bebidas", Price = 40m });
+            var dbProducts = PosDb.GetActiveProducts();
+            foreach (var p in dbProducts)
+                Products.Add(p);
         }
 
         public void RefreshFilteredProducts()
